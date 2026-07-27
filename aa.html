@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic & Life Productivity Hub</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SortableJS for Drag and Drop -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              500: '#22c55e',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #bbf7d0; border-radius: 10px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #15803d; }
+    
+    body, div, aside, main, section, nav, button, a, input, select {
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+  </style>
+</head>
+<body class="bg-[#f4f7f4] dark:bg-[#0b1a10] text-gray-800 dark:text-emerald-100 font-sans antialiased h-screen overflow-hidden flex flex-col md:flex-row">
+
+  <!-- MOBILE HEADER -->
+  <div class="md:hidden bg-brand-900 text-white p-4 flex justify-between items-center z-50">
+    <div class="flex items-center space-x-2 font-bold text-lg">
+      <i class="fa-solid fa-leaf text-brand-200"></i>
+      <span>Academix Hub</span>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button onclick="toggleDarkMode()" class="p-2 text-brand-200 hover:text-white"><i class="fa-solid fa-moon text-lg"></i></button>
+      <button onclick="toggleAiPanel()" class="p-2 text-brand-200 hover:text-white"><i class="fa-solid fa-wand-magic-sparkles text-lg"></i></button>
+      <button onclick="toggleSidebar()" class="p-2"><i class="fa-solid fa-bars text-xl"></i></button>
+    </div>
+  </div>
+
+  <!-- LEFT SIDEBAR -->
+  <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-white dark:bg-[#112417] border-r border-emerald-100 dark:border-emerald-900/50 p-5 space-y-6 z-40 transition-all duration-300 absolute md:relative inset-y-0 left-0 h-full shadow-lg md:shadow-none">
+    <!-- Brand Logo -->
+    <div class="flex items-center justify-between px-2">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-brand-800 flex items-center justify-center text-white shadow-md">
+          <i class="fa-solid fa-leaf text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-gray-900 dark:text-white text-lg leading-tight">Academix</h1>
+          <p class="text-xs text-brand-700 dark:text-brand-200 font-medium">Personal Hub</p>
+        </div>
+      </div>
+      <!-- Theme Switcher Button -->
+      <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl bg-gray-100 dark:bg-emerald-900/60 text-gray-600 dark:text-brand-200 hover:scale-110 transition-transform flex items-center justify-center" title="Toggle Light/Dark Mode">
+        <i class="fa-solid fa-moon dark:hidden"></i>
+        <i class="fa-solid fa-sun hidden dark:block"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="space-y-2 flex-1">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all transform hover:scale-[1.03] active:scale-[0.98] bg-brand-800 text-white shadow-md">
+        <i class="fa-solid fa-house w-5"></i><span>Main Dashboard</span>
+      </button>
+      <button onclick="switchTab('notes')" id="nav-notes" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 dark:text-emerald-200/80 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:text-brand-800 dark:hover:text-emerald-100 transition-all transform hover:scale-[1.03] active:scale-[0.98]">
+        <i class="fa-solid fa-book-bookmark w-5"></i><span>Notes</span>
+      </button>
+      <button onclick="switchTab('google-meet')" id="nav-google-meet" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 dark:text-emerald-200/80 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:text-brand-800 dark:hover:text-emerald-100 transition-all transform hover:scale-[1.03] active:scale-[0.98]">
+        <i class="fa-solid fa-video w-5"></i><span>Google Meeting</span>
+      </button>
+      <button onclick="switchTab('group-chats')" id="nav-group-chats" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 dark:text-emerald-200/80 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:text-brand-800 dark:hover:text-emerald-100 transition-all transform hover:scale-[1.03] active:scale-[0.98]">
+        <i class="fa-solid fa-comments w-5"></i><span>Group Chats</span>
+      </button>
+      <button onclick="switchTab('todo')" id="nav-todo" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 dark:text-emerald-200/80 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:text-brand-800 dark:hover:text-emerald-100 transition-all transform hover:scale-[1.03] active:scale-[0.98]">
+        <i class="fa-solid fa-list-check w-5"></i><span>To Do</span>
+      </button>
+      <button onclick="switchTab('grades')" id="nav-grades" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 dark:text-emerald-200/80 hover:bg-brand-50 dark:hover:bg-brand-900/40 hover:text-brand-800 dark:hover:text-emerald-100 transition-all transform hover:scale-[1.03] active:scale-[0.98]">
+        <i class="fa-solid fa-graduation-cap w-5"></i><span>Grades</span>
+      </button>
+    </nav>
+
+    <!-- AI Toggle Button -->
+    <button onclick="toggleAiPanel()" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-brand-50 dark:bg-emerald-950/60 text-brand-800 dark:text-emerald-200 font-medium text-xs hover:bg-brand-100 transition-all transform hover:scale-[1.02]">
+      <span class="flex items-center gap-2"><i class="fa-solid fa-sparkles text-brand-500"></i> AI Assistant</span>
+      <i class="fa-solid fa-sidebar text-xs"></i>
+    </button>
+
+    <!-- User Profile Card -->
+    <div class="pt-3 border-t border-gray-100 dark:border-emerald-900/50 flex items-center space-x-3 px-2">
+      <div class="w-9 h-9 rounded-full bg-brand-200 text-brand-900 font-extrabold flex items-center justify-center text-sm shadow-sm">
+        ME
+      </div>
+      <div class="overflow-hidden">
+        <p class="text-sm font-semibold text-gray-800 dark:text-emerald-100 truncate">Mechanical Engineering</p>
+        <p class="text-xs text-gray-400 dark:text-emerald-400/60 truncate">Class Schedule 2026</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER MAIN CONTENT AREA -->
+  <main class="flex-1 h-full overflow-y-auto custom-scrollbar p-4 md:p-8 space-y-8">
+    
+    <!-- 1. MAIN DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view-panel space-y-8">
+      <!-- Header Banner -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-brand-900 via-brand-800 to-emerald-800 p-6 rounded-3xl text-white shadow-lg">
+        <div>
+          <h2 class="text-2xl font-bold">Welcome back! 👋</h2>
+          <p class="text-brand-100 text-sm mt-1">Here is your organized academic workspace and daily class schedule.</p>
+        </div>
+        <div class="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/10 text-xs">
+          <i class="fa-regular fa-calendar text-brand-200"></i>
+          <span id="current-date">Today's Overview</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE CLASS SCHEDULE COMPONENT (REPLACED GOOGLE CALENDAR) -->
+      <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-brand-700 dark:text-brand-400"></i> Weekly Class Schedule
+            </h3>
+            <p class="text-xs text-gray-400 dark:text-emerald-300/70">Click on any day to view your specific timetable and room assignments.</p>
+          </div>
+          <span class="text-xs font-semibold bg-brand-50 dark:bg-emerald-950 text-brand-800 dark:text-emerald-200 px-3 py-1.5 rounded-xl border border-brand-100 dark:border-emerald-800/50 flex items-center gap-1.5 self-start sm:self-auto">
+            <i class="fa-solid fa-clock text-brand-500"></i> ME Department
+          </span>
+        </div>
+
+        <!-- Day Selector Tabs -->
+        <div class="flex overflow-x-auto gap-2 pb-1 custom-scrollbar" id="schedule-day-tabs">
+          <button onclick="selectScheduleDay('Monday')" id="tab-Monday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-brand-800 text-white shadow-sm">Monday</button>
+          <button onclick="selectScheduleDay('Tuesday')" id="tab-Tuesday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50">Tuesday</button>
+          <button onclick="selectScheduleDay('Wednesday')" id="tab-Wednesday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50">Wednesday</button>
+          <button onclick="selectScheduleDay('Thursday')" id="tab-Thursday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50">Thursday</button>
+          <button onclick="selectScheduleDay('Friday')" id="tab-Friday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50">Friday</button>
+          <button onclick="selectScheduleDay('Saturday')" id="tab-Saturday" class="schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50">Saturday</button>
+        </div>
+
+        <!-- Schedule Items List Container -->
+        <div id="schedule-list-container" class="space-y-3 min-h-[160px]">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+
+      <!-- KANBAN TO-DO BOARD (NOTION STYLE) -->
+      <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <h3 class="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+              <i class="fa-solid fa-check-double text-brand-700 dark:text-brand-500"></i> Notion Task Board
+            </h3>
+            <div class="bg-gray-100 dark:bg-emerald-950/80 p-1 rounded-xl flex text-xs font-semibold">
+              <button onclick="filterTasks('academic')" id="tab-acad" class="px-3 py-1 rounded-lg bg-white dark:bg-emerald-800 shadow-sm text-brand-800 dark:text-white transition-all transform hover:scale-[1.05]">Academics</button>
+              <button onclick="filterTasks('personal')" id="tab-pers" class="px-3 py-1 rounded-lg text-gray-500 dark:text-emerald-300/60 hover:text-gray-800 transition-all transform hover:scale-[1.05]">Personal</button>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="toggleQuickTaskForm()" class="bg-brand-800 hover:bg-brand-900 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all transform hover:scale-[1.05] flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-plus"></i> Add Task
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Quick Add Task Bar -->
+        <div id="quick-task-bar" class="hidden bg-brand-50/50 dark:bg-emerald-950/50 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <input type="text" id="q-task-title" placeholder="Task Name..." class="p-2.5 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#183222] text-gray-800 dark:text-emerald-100 focus:outline-none">
+            <input type="text" id="q-task-subject" placeholder="Course / Subject..." class="p-2.5 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#183222] text-gray-800 dark:text-emerald-100 focus:outline-none">
+            <select id="q-task-prio" class="p-2.5 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#183222] text-gray-800 dark:text-emerald-100 focus:outline-none">
+              <option value="high">🔴 High Priority</option>
+              <option value="med" selected>🟡 Medium Priority</option>
+              <option value="low">🟢 Low Priority</option>
+            </select>
+            <input type="text" id="q-task-date" placeholder="Due Date (e.g. Fri, Aug 13)" class="p-2.5 rounded-xl border border-gray-200 dark:border-emerald-800 bg-white dark:bg-[#183222] text-gray-800 dark:text-emerald-100 focus:outline-none">
+          </div>
+          <div class="flex justify-end space-x-2">
+            <button onclick="toggleQuickTaskForm()" class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:text-emerald-300">Cancel</button>
+            <button onclick="submitQuickTask()" class="px-4 py-1.5 text-xs bg-brand-800 text-white font-bold rounded-xl hover:bg-brand-900 transition-all">Save Task</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- High Priority Column -->
+          <div class="bg-rose-50/60 dark:bg-rose-950/20 p-4 rounded-2xl border border-rose-100 dark:border-rose-900/30">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider bg-rose-100 dark:bg-rose-900/50 px-2.5 py-1 rounded-md">🔴 High Priority</span>
+              <span class="text-xs font-semibold text-rose-400" id="count-high">0</span>
+            </div>
+            <div id="col-high" class="kanban-col space-y-3 min-h-[120px]">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Medium Priority Column -->
+          <div class="bg-amber-50/60 dark:bg-amber-950/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/30">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider bg-amber-100 dark:bg-amber-900/50 px-2.5 py-1 rounded-md">🟡 Medium Priority</span>
+              <span class="text-xs font-semibold text-amber-400" id="count-med">0</span>
+            </div>
+            <div id="col-med" class="kanban-col space-y-3 min-h-[120px]">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Low Priority Column -->
+          <div class="bg-emerald-50/60 dark:bg-emerald-950/20 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold text-brand-800 dark:text-emerald-300 uppercase tracking-wider bg-brand-100 dark:bg-emerald-900/50 px-2.5 py-1 rounded-md">🟢 Low Priority</span>
+              <span class="text-xs font-semibold text-brand-600" id="count-low">0</span>
+            </div>
+            <div id="col-low" class="kanban-col space-y-3 min-h-[120px]">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOOGLE DOCS NOTES SUMMARY -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+            <i class="fa-solid fa-file-lines text-brand-700 dark:text-brand-500"></i> Google Docs Class Notes
+          </h3>
+          <button onclick="switchTab('notes')" class="text-xs text-brand-700 dark:text-brand-300 font-semibold hover:underline">View All (7) →</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="dashboard-notes-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- CLASS MEETINGS & SCROLLABLE GROUP CHATS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Google Meet Links -->
+        <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 dark:text-white text-md flex items-center gap-2">
+              <i class="fa-solid fa-video text-emerald-600"></i> Google Meet Rooms
+            </h3>
+            <button onclick="switchTab('google-meet')" class="text-xs text-brand-700 dark:text-brand-300 font-semibold hover:underline">See All →</button>
+          </div>
+          <div class="space-y-2.5" id="dashboard-meets-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Scrollable Messenger Group Chats Card -->
+        <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 dark:text-white text-md flex items-center gap-2">
+              <i class="fa-solid fa-comments text-brand-700 dark:text-brand-400"></i> Messenger Group Chats
+            </h3>
+            <span class="text-[10px] bg-brand-100 dark:bg-emerald-900 text-brand-900 dark:text-emerald-100 px-2 py-0.5 rounded-full font-bold">Scrollable List</span>
+          </div>
+          <!-- Scroll Container -->
+          <div class="max-h-64 overflow-y-auto custom-scrollbar space-y-2.5 pr-1" id="dashboard-chats-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. DEDICATED NOTES PANEL -->
+    <section id="view-notes" class="view-panel hidden space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Google Docs Class Notes</h2>
+        <p class="text-gray-500 dark:text-emerald-300/70 text-sm">Direct shortcuts to your official class documents. Opens in a new tab.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="full-notes-grid">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+    <!-- 3. DEDICATED GOOGLE MEETINGS PANEL -->
+    <section id="view-google-meet" class="view-panel hidden space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Google Meet Links</h2>
+        <p class="text-gray-500 dark:text-emerald-300/70 text-sm">Join your online lectures and virtual classrooms with one click.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="full-meets-grid">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+    <!-- 4. DEDICATED GROUP CHATS PANEL -->
+    <section id="view-group-chats" class="view-panel hidden space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Class Messenger & Group Chats</h2>
+          <p class="text-gray-500 dark:text-emerald-300/70 text-sm">Quick access to all your course section group chats in one scrollable menu.</p>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm">
+        <div class="max-h-[500px] overflow-y-auto custom-scrollbar space-y-3 pr-2" id="full-chats-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. DEDICATED TO DO PANEL -->
+    <section id="view-todo" class="view-panel hidden space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">To Do Task Manager</h2>
+        <p class="text-gray-500 dark:text-emerald-300/70 text-sm">Add, manage, complete, or remove tasks manually or using the AI assistant.</p>
+      </div>
+
+      <!-- Add New Task Manual Form -->
+      <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4">
+        <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-brand-700 dark:text-brand-400"></i> Add New Task
+        </h3>
+        <form onsubmit="addNewTaskManual(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
+          <input type="text" id="todo-title" placeholder="Task Title (e.g., Chapter 1 Essay)" required class="p-3 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-emerald-950/50 text-gray-800 dark:text-emerald-100 focus:outline-none focus:border-brand-500">
+          <input type="text" id="todo-subject" placeholder="Course / Subject" required class="p-3 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-emerald-950/50 text-gray-800 dark:text-emerald-100 focus:outline-none focus:border-brand-500">
+          <select id="todo-priority" class="p-3 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-emerald-950/50 text-gray-800 dark:text-emerald-100 focus:outline-none">
+            <option value="high">🔴 High Priority</option>
+            <option value="med" selected>🟡 Medium Priority</option>
+            <option value="low">🟢 Low Priority</option>
+          </select>
+          <select id="todo-category" class="p-3 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-emerald-950/50 text-gray-800 dark:text-emerald-100 focus:outline-none">
+            <option value="academic">Academic</option>
+            <option value="personal">Personal</option>
+          </select>
+          <div class="flex gap-2">
+            <input type="text" id="todo-date" placeholder="Due Date" class="p-3 rounded-xl border border-gray-200 dark:border-emerald-800 bg-gray-50 dark:bg-emerald-950/50 text-gray-800 dark:text-emerald-100 focus:outline-none w-full">
+            <button type="submit" class="bg-brand-800 hover:bg-brand-900 text-white font-bold px-4 rounded-xl transition-all transform hover:scale-105 shrink-0">
+              Add
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Task List Container -->
+      <div class="bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4">
+        <h3 class="font-bold text-lg text-gray-900 dark:text-white">Active Task List</h3>
+        <div id="todo-full-list" class="space-y-3">
+          <!-- Dynamically Rendered -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DEDICATED GRADE TRACKER PANEL -->
+    <section id="view-grades" class="view-panel hidden space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Course Grade Tracker</h2>
+          <p class="text-gray-500 dark:text-emerald-300/70 text-sm">Evaluation: <b>50% Class Standing Avg</b> + <b>50% Exam Avg</b>. Add, edit, or erase individual scores below!</p>
+        </div>
+      </div>
+
+      <!-- Subject Grade Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="grades-cards-container">
+        <!-- Generated dynamically via JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR: GEMINI AI PANEL -->
+  <aside id="ai-panel" class="w-full md:w-80 bg-white dark:bg-[#112417] border-l border-emerald-100 dark:border-emerald-900/50 flex flex-col h-full z-40 transition-all duration-300 ease-in-out shrink-0">
+    <div class="p-4 border-b border-gray-100 dark:border-emerald-900/50 flex items-center justify-between bg-brand-50/50 dark:bg-emerald-950/40">
+      <div class="flex items-center space-x-2">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-emerald-500 to-brand-500 flex items-center justify-center text-white text-xs shadow-sm">
+          <i class="fa-solid fa-sparkles"></i>
+        </div>
+        <span class="font-bold text-gray-800 dark:text-white text-sm">Gemini Assistant</span>
+      </div>
+      <button onclick="toggleAiPanel()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors p-1">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- AI Feed -->
+    <div id="ai-feed" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs custom-scrollbar">
+      <div class="bg-brand-50 dark:bg-emerald-950/60 p-3 rounded-2xl border border-brand-100 dark:border-emerald-900/40 text-brand-900 dark:text-emerald-200">
+        👋 <b>Hi there!</b> Paste task deadlines or exam scores here. I'll automatically correct grammar and organize it for you!
+      </div>
+    </div>
+
+    <!-- AI Input -->
+    <div class="p-4 border-t border-gray-100 dark:border-emerald-900/50 space-y-2 bg-white dark:bg-[#112417]">
+      <div class="relative">
+        <textarea id="ai-input" rows="3" placeholder="e.g. essay due next friday in purposive communication" class="w-full p-3 pr-10 text-xs bg-gray-50 dark:bg-emerald-950/50 border border-gray-200 dark:border-emerald-800/50 rounded-xl text-gray-800 dark:text-emerald-100 focus:outline-none focus:border-brand-500 resize-none"></textarea>
+        <button onclick="processAiInput()" class="absolute right-2 bottom-3 w-7 h-7 bg-brand-800 text-white rounded-lg flex items-center justify-center hover:bg-brand-900 transition-all transform hover:scale-110">
+          <i class="fa-solid fa-arrow-up text-xs"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // PRE-LOADED CLASS SCHEDULE DATA
+    const classSchedule = {
+      Monday: [
+        { time: "07:00 AM - 08:30 AM", code: "EE 231", title: "Basic Electrical Engineering (Lec)", room: "TBA", type: "lecture" },
+        { time: "10:00 AM - 11:30 AM", code: "GE Elect 2", title: "Gender and Society / Entrepreneurial Mind", room: "ME", type: "lecture" },
+        { time: "11:30 AM - 01:00 PM", code: "BREAK", title: "Lunch Break", room: "--", type: "break" },
+        { time: "01:00 PM - 02:30 PM", code: "Math 111E", title: "Engineering Data Analysis", room: "BH 30", type: "lecture" },
+        { time: "04:00 PM - 05:30 PM", code: "Augustine 3", title: "Christian Morality", room: "Online", type: "online" }
+      ],
+      Tuesday: [
+        { time: "07:00 AM - 08:30 AM", code: "GE 6", title: "Art Appreciation", room: "Online", type: "online" },
+        { time: "08:30 AM - 10:00 AM", code: "ME 231", title: "Thermodynamics 1", room: "Online", type: "online" },
+        { time: "10:00 AM - 01:00 PM", code: "BREAK", title: "Lunch Break", room: "--", type: "break" },
+        { time: "01:00 PM - 04:00 PM", code: "ME 232a", title: "Workshop Theory and Practice (Lab)", room: "ME LAB", type: "lab" },
+        { time: "04:30 PM - 05:30 PM", code: "ME 110", title: "Differential Equations", room: "BH 30", type: "lecture" }
+      ],
+      Wednesday: [
+        { time: "10:00 AM - 11:30 AM", code: "GE 5", title: "Purposive Communication", room: "Online", type: "online" }
+      ],
+      Thursday: [
+        { time: "07:00 AM - 10:00 AM", code: "EE 231a", title: "Basic Electrical Engineering (Lab)", room: "ECE LAB", type: "lab" },
+        { time: "10:00 AM - 11:30 AM", code: "GE Elect 2", title: "Gender and Society / Entrepreneurial Mind", room: "Online", type: "online" },
+        { time: "11:00 AM - 01:00 PM", code: "BREAK", title: "Lunch Break", room: "--", type: "break" },
+        { time: "01:00 PM - 02:30 PM", code: "Math 111E", title: "Engineering Data Analysis", room: "BH 30", type: "lecture" },
+        { time: "04:00 PM - 05:30 PM", code: "Augustine 3", title: "Christian Morality", room: "Online", type: "online" }
+      ],
+      Friday: [
+        { time: "07:00 AM - 08:30 AM", code: "GE 6", title: "Art Appreciation", room: "Online", type: "online" },
+        { time: "08:30 AM - 10:00 AM", code: "ME 231", title: "Thermodynamics 1", room: "BH 30 (CR)", type: "lecture" },
+        { time: "04:00 PM - 05:30 PM", code: "Math 110", title: "Differential Equation", room: "BH 30", type: "lecture" }
+      ],
+      Saturday: [
+        { time: "10:00 AM - 11:30 AM", code: "GE 5", title: "Purposive Communication", room: "Online", type: "online" },
+        { time: "11:30 AM - 01:00 PM", code: "BREAK", title: "Lunch Break", room: "--", type: "break" },
+        { time: "01:00 PM - 04:00 PM", code: "Mech 310", title: "Statics of Rigid Bodies", room: "No Room", type: "lecture" },
+        { time: "04:00 PM - 06:00 PM", code: "PATHFIT 3", title: "Dance", room: "GYM", type: "lab" }
+      ]
+    };
+
+    let activeScheduleDay = "Monday";
+
+    function renderSchedule() {
+      const container = document.getElementById('schedule-list-container');
+      const dayClasses = classSchedule[activeScheduleDay] || [];
+
+      if (dayClasses.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-gray-400 font-medium text-xs">No classes scheduled for ${activeScheduleDay}. Enjoy your break! 🎉</div>`;
+        return;
+      }
+
+      container.innerHTML = dayClasses.map(item => {
+        let typeBadge = '';
+        let borderClass = 'border-emerald-100 dark:border-emerald-900/40';
+
+        if (item.type === 'online') {
+          typeBadge = `<span class="bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fa-solid fa-wifi"></i> Online</span>`;
+        } else if (item.type === 'lab') {
+          typeBadge = `<span class="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fa-solid fa-flask"></i> Lab</span>`;
+        } else if (item.type === 'break') {
+          typeBadge = `<span class="bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fa-solid fa-utensils"></i> Break</span>`;
+          borderClass = 'border-amber-200/60 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20';
+        } else {
+          typeBadge = `<span class="bg-emerald-100 text-brand-800 dark:bg-emerald-950 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fa-solid fa-chalkboard-user"></i> Lecture</span>`;
+        }
+
+        return `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-gray-50/80 dark:bg-emerald-950/40 rounded-2xl border ${borderClass} gap-3 hover:shadow-sm transition-all">
+            <div class="flex items-start sm:items-center space-x-3">
+              <div class="bg-white dark:bg-[#183222] p-2.5 rounded-xl border border-gray-100 dark:border-emerald-800/60 text-center shrink-0 min-w-[110px]">
+                <p class="text-[11px] font-bold text-gray-800 dark:text-emerald-200 flex items-center justify-center gap-1">
+                  <i class="fa-regular fa-clock text-brand-500 text-[10px]"></i> ${item.time}
+                </p>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-extrabold text-xs text-brand-800 dark:text-brand-300 uppercase">${item.code}</span>
+                  <span class="text-[10px] text-gray-400 font-medium">• ${item.room}</span>
+                </div>
+                <h4 class="font-semibold text-xs text-gray-800 dark:text-emerald-100 mt-0.5">${item.title}</h4>
+              </div>
+            </div>
+            <div class="self-end sm:self-auto">
+              ${typeBadge}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectScheduleDay(day) {
+      activeScheduleDay = day;
+      document.querySelectorAll('.schedule-day-tab').forEach(tab => {
+        tab.className = "schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-gray-100 dark:bg-emerald-950/80 text-gray-600 dark:text-emerald-300 hover:bg-brand-50";
+      });
+
+      const selectedTab = document.getElementById(`tab-${day}`);
+      if (selectedTab) {
+        selectedTab.className = "schedule-day-tab px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 bg-brand-800 text-white shadow-sm";
+      }
+
+      renderSchedule();
+    }
+
+    // LINKS DATA
+    const googleDocNotes = [
+      { subject: "Gender and Society", url: "https://docs.google.com/document/d/1kY6T-s6cd0sSb3KGP48AN7hWJC6-nIYi/edit?usp=sharing" },
+      { subject: "Art Appreciation", url: "https://docs.google.com/document/d/1_1uAg3Vhhd42ARFEIKbo5TlNvbDhW_ym/edit?usp=sharing" },
+      { subject: "Basic Electrical Engineering", url: "https://docs.google.com/document/d/1Z5Iv8CpCkB2NJ8mSdGy23rD53irNJLYB/edit?usp=sharing" },
+      { subject: "Statics of Rigid Bodies", url: "https://docs.google.com/document/d/12n6bbwFK-ZGrQd2Hn-dKObjuawQm8fAY/edit?usp=sharing" },
+      { subject: "Purposive Communication", url: "https://docs.google.com/document/d/1jjO1a-W4BJyMyJQ7lSH149nv148PO6qW/edit?usp=sharing" },
+      { subject: "Engineering Data Analysis", url: "https://docs.google.com/document/d/1qWqJOjS2iUdW2-JskBzciv5T4FuKIQJXlIRZvkOn9xw/edit?usp=sharing" },
+      { subject: "Differential Equation", url: "https://docs.google.com/document/d/110a7eWOu1k7FCospDCFZ088BY8PEIYR7/edit?usp=sharing" }
+    ];
+
+    const googleMeetLinks = [
+      { subject: "Art Appreciation", url: "https://meet.google.com/fen-mayf-wwh" },
+      { subject: "Purposive Communication", url: "https://meet.google.com/fen-mayf-wwh" },
+      { subject: "Gender and Society", url: "https://meet.google.com/pvu-nwsy-jbk" },
+      { subject: "Christian Morality", url: "https://meet.google.com/mos-jvgb-gss" }
+    ];
+
+    const messengerGroupChats = [
+      { subject: "Differential Equation", url: "https://www.facebook.com/messages/t/857543600455020" },
+      { subject: "Statics and Rigid Bodies", url: "https://www.facebook.com/messages/t/1024656540336615" },
+      { subject: "Basic Electrical Engineering", url: "https://www.facebook.com/messages/t/1744174793401960" },
+      { subject: "Engineering Data Analysis", url: "https://www.facebook.com/messages/t/1393162329343581" },
+      { subject: "Workshop Theory and Practice", url: "https://www.facebook.com/messages/t/27407126888986026" },
+      { subject: "Pathfit 3", url: "https://www.facebook.com/messages/t/1394074098749194" },
+      { subject: "Purposive Communication", url: "https://meet.google.com/jib-thwc-phf" },
+      { subject: "Gender and Society", url: "#" },
+      { subject: "Christian Morality", url: "https://www.facebook.com/messages/t/1044256337982254" }
+    ];
+
+    // DYNAMIC TASK SYSTEM STATE
+    let tasksState = [
+      { id: 1, title: "Infographic Activity", subject: "Gender & Society", priority: "high", dueDate: "Tue, Aug 10", category: "academic" },
+      { id: 2, title: "Problem Set #2 Solution", subject: "Differential Equations", priority: "med", dueDate: "Fri, Aug 13", category: "academic" },
+      { id: 3, title: "Read Gallery Critique", subject: "Art Appreciation", priority: "low", dueDate: "Next Week", category: "academic" }
+    ];
+
+    let currentTaskFilter = 'academic';
+
+    // ALL 10 COURSES GRADE DATA STATE
+    let gradesState = [
+      { subject: "Gender and Society", cs: [{ id: 1, name: "Quiz 1", score: 95 }, { id: 2, name: "Infographic", score: 90 }], exam: [{ id: 1, name: "Midterm Exam", score: 92 }] },
+      { subject: "Art Appreciation", cs: [{ id: 1, name: "Critique Paper", score: 88 }], exam: [{ id: 1, name: "Midterm Exam", score: 90 }] },
+      { subject: "Basic Electrical Engineering", cs: [{ id: 1, name: "Lab Act 1", score: 85 }], exam: [{ id: 1, name: "Midterm Exam", score: 88 }] },
+      { subject: "Statics and Rigid Bodies", cs: [{ id: 1, name: "Problem Set 1", score: 90 }], exam: [{ id: 1, name: "Midterm Exam", score: 86 }] },
+      { subject: "Purposive Communication", cs: [{ id: 1, name: "Speech Task", score: 94 }], exam: [{ id: 1, name: "Midterm Exam", score: 92 }] },
+      { subject: "Engineering Data Analysis", cs: [{ id: 1, name: "Worksheet 1", score: 89 }], exam: [{ id: 1, name: "Midterm Exam", score: 91 }] },
+      { subject: "Differential Equation", cs: [{ id: 1, name: "Quiz 1", score: 86 }], exam: [{ id: 1, name: "Midterm Exam", score: 90 }] },
+      { subject: "Christian Morality", cs: [{ id: 1, name: "Reflection 1", score: 96 }], exam: [{ id: 1, name: "Midterm Exam", score: 94 }] },
+      { subject: "Workshop Theory and Practice", cs: [{ id: 1, name: "Practical 1", score: 92 }], exam: [{ id: 1, name: "Midterm Exam", score: 89 }] },
+      { subject: "Pathfit 3", cs: [{ id: 1, name: "Fitness Routine", score: 98 }], exam: [{ id: 1, name: "Practical Exam", score: 95 }] }
+    ];
+
+    // RENDER TASKS IN KANBAN & TO-DO PANEL
+    function renderTasks() {
+      const highCol = document.getElementById('col-high');
+      const medCol = document.getElementById('col-med');
+      const lowCol = document.getElementById('col-low');
+
+      highCol.innerHTML = '';
+      medCol.innerHTML = '';
+      lowCol.innerHTML = '';
+
+      const filtered = tasksState.filter(t => t.category === currentTaskFilter);
+
+      let hCount = 0, mCount = 0, lCount = 0;
+
+      filtered.forEach(task => {
+        const cardHTML = `
+          <div class="task-card bg-white dark:bg-[#183222] p-4 rounded-xl shadow-sm border border-emerald-100 dark:border-emerald-900/40 cursor-grab active:cursor-grabbing hover:shadow-md transform hover:scale-[1.02] transition-all relative group" data-id="${task.id}">
+            <div class="flex justify-between items-start">
+              <span class="text-[10px] font-bold text-brand-800 dark:text-brand-200 bg-brand-50 dark:bg-brand-900/60 px-2 py-0.5 rounded-full uppercase truncate max-w-[140px]">${task.subject}</span>
+              <button onclick="deleteTask(${task.id})" class="text-gray-300 dark:text-gray-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors p-1" title="Delete Task">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+            <h4 class="font-semibold text-sm text-gray-800 dark:text-emerald-100 mt-2">${task.title}</h4>
+            <div class="flex items-center justify-between text-xs text-gray-400 dark:text-emerald-400/60 mt-3 pt-2 border-t border-gray-100 dark:border-emerald-900/40">
+              <span><i class="fa-regular fa-clock mr-1"></i>${task.dueDate || 'Upcoming'}</span>
+              <i class="fa-solid fa-grip-vertical text-gray-300"></i>
+            </div>
+          </div>
+        `;
+
+        if (task.priority === 'high') {
+          highCol.innerHTML += cardHTML;
+          hCount++;
+        } else if (task.priority === 'med') {
+          medCol.innerHTML += cardHTML;
+          mCount++;
+        } else {
+          lowCol.innerHTML += cardHTML;
+          lCount++;
+        }
+      });
+
+      document.getElementById('count-high').innerText = hCount;
+      document.getElementById('count-med').innerText = mCount;
+      document.getElementById('count-low').innerText = lCount;
+
+      // Render Dedicated To-Do Panel List
+      const todoListContainer = document.getElementById('todo-full-list');
+      if (todoListContainer) {
+        if (tasksState.length === 0) {
+          todoListContainer.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium">No tasks found. Add a task above or through the AI assistant!</div>`;
+        } else {
+          todoListContainer.innerHTML = tasksState.map(task => {
+            const prioBadge = task.priority === 'high' 
+              ? '<span class="bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">High Priority</span>'
+              : task.priority === 'med'
+              ? '<span class="bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Med Priority</span>'
+              : '<span class="bg-emerald-100 text-brand-800 dark:bg-emerald-900/40 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Low Priority</span>';
+
+            return `
+              <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 hover:shadow-md transition-all">
+                <div class="flex items-center space-x-3">
+                  <button onclick="deleteTask(${task.id})" class="w-6 h-6 rounded-lg border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-transparent hover:text-emerald-600 hover:border-emerald-600 transition-all shrink-0" title="Mark Complete">
+                    <i class="fa-solid fa-check text-xs"></i>
+                  </button>
+                  <div>
+                    <h4 class="font-bold text-sm text-gray-800 dark:text-emerald-100">${task.title}</h4>
+                    <p class="text-xs text-gray-400 dark:text-emerald-400/60 mt-0.5">${task.subject} • <i class="fa-regular fa-clock"></i> ${task.dueDate || 'No Date'} • <span class="capitalize">${task.category}</span></p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                  ${prioBadge}
+                  <button onclick="deleteTask(${task.id})" class="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 p-2 transition-colors" title="Delete task">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function toggleQuickTaskForm() {
+      document.getElementById('quick-task-bar').classList.toggle('hidden');
+    }
+
+    function submitQuickTask() {
+      const title = document.getElementById('q-task-title').value.trim();
+      const subject = document.getElementById('q-task-subject').value.trim() || 'General';
+      const priority = document.getElementById('q-task-prio').value;
+      const dueDate = document.getElementById('q-task-date').value.trim() || 'Upcoming';
+
+      if (!title) return;
+
+      tasksState.push({
+        id: Date.now(),
+        title,
+        subject,
+        priority,
+        category: currentTaskFilter,
+        dueDate
+      });
+
+      document.getElementById('q-task-title').value = '';
+      document.getElementById('q-task-subject').value = '';
+      document.getElementById('q-task-date').value = '';
+      toggleQuickTaskForm();
+      renderTasks();
+    }
+
+    function addNewTaskManual(e) {
+      e.preventDefault();
+      const title = document.getElementById('todo-title').value.trim();
+      const subject = document.getElementById('todo-subject').value.trim();
+      const priority = document.getElementById('todo-priority').value;
+      const category = document.getElementById('todo-category').value;
+      const dueDate = document.getElementById('todo-date').value.trim() || 'Upcoming';
+
+      if (!title) return;
+
+      tasksState.push({
+        id: Date.now(),
+        title,
+        subject,
+        priority,
+        category,
+        dueDate
+      });
+
+      document.getElementById('todo-title').value = '';
+      document.getElementById('todo-subject').value = '';
+      document.getElementById('todo-date').value = '';
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasksState = tasksState.filter(t => t.id !== id);
+      renderTasks();
+    }
+
+    function filterTasks(type) {
+      currentTaskFilter = type;
+      const tabAcad = document.getElementById('tab-acad');
+      const tabPers = document.getElementById('tab-pers');
+      if(type === 'academic') {
+        tabAcad.className = "px-3 py-1 rounded-lg bg-white dark:bg-emerald-800 shadow-sm text-brand-800 dark:text-white transition-all transform hover:scale-[1.05]";
+        tabPers.className = "px-3 py-1 rounded-lg text-gray-500 dark:text-emerald-300/60 hover:text-gray-800 transition-all transform hover:scale-[1.05]";
+      } else {
+        tabPers.className = "px-3 py-1 rounded-lg bg-white dark:bg-emerald-800 shadow-sm text-brand-800 dark:text-white transition-all transform hover:scale-[1.05]";
+        tabAcad.className = "px-3 py-1 rounded-lg text-gray-500 dark:text-emerald-300/60 hover:text-gray-800 transition-all transform hover:scale-[1.05]";
+      }
+      renderTasks();
+    }
+
+    // AI PROCESS SIMULATION
+    function processAiInput() {
+      const input = document.getElementById('ai-input').value.trim();
+      if(!input) return;
+
+      const feed = document.getElementById('ai-feed');
+      feed.innerHTML += `<div class="bg-gray-100 dark:bg-emerald-900/40 p-3 rounded-2xl text-gray-700 dark:text-emerald-200 font-medium">${input}</div>`;
+
+      // Add to tasks State
+      const formattedTitle = capitalizeWords(input);
+      tasksState.push({
+        id: Date.now(),
+        title: formattedTitle,
+        subject: "Academic",
+        priority: "high",
+        category: "academic",
+        dueDate: "Upcoming"
+      });
+      renderTasks();
+
+      feed.innerHTML += `
+        <div class="bg-emerald-50 dark:bg-emerald-950/80 p-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-100 space-y-1">
+          ✨ <b>Parsed & Formatted:</b><br>
+          • <b>Task:</b> ${formattedTitle}<br>
+          <i>Added directly to High Priority task list.</i>
+        </div>`;
+
+      document.getElementById('ai-input').value = '';
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    // RENDER LINKS & GROUP CHATS
+    function populateLinkCards() {
+      // Notes Cards
+      const notesHTML = googleDocNotes.map(doc => `
+        <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-[#183222] p-5 rounded-2xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm hover:shadow-md transform hover:scale-[1.03] transition-all group block">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-file-word text-lg"></i>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-300 dark:text-emerald-600 group-hover:text-brand-700 transition-colors"></i>
+          </div>
+          <h4 class="font-semibold text-gray-800 dark:text-emerald-100 mt-3 group-hover:text-brand-800 dark:group-hover:text-brand-300 text-sm">${doc.subject}</h4>
+          <p class="text-[11px] text-gray-400 dark:text-emerald-400/60 mt-1">Google Docs Notes</p>
+        </a>
+      `).join('');
+      
+      document.getElementById('dashboard-notes-grid').innerHTML = notesHTML.slice(0, 3);
+      document.getElementById('full-notes-grid').innerHTML = notesHTML;
+
+      // Meet Cards
+      const meetsHTML = googleMeetLinks.map(meet => `
+        <a href="${meet.url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/60 transition-all transform hover:scale-[1.02] text-sm font-medium text-emerald-900 dark:text-emerald-100 border border-emerald-100/50 dark:border-emerald-900/30">
+          <div class="flex items-center space-x-3 truncate">
+            <i class="fa-solid fa-camera-retro text-emerald-600 dark:text-emerald-400"></i>
+            <span class="truncate">${meet.subject}</span>
+          </div>
+          <i class="fa-solid fa-external-link text-xs opacity-60"></i>
+        </a>
+      `).join('');
+
+      document.getElementById('dashboard-meets-list').innerHTML = meetsHTML;
+      document.getElementById('full-meets-grid').innerHTML = meetsHTML;
+
+      // Group Chat Cards
+      const chatsHTML = messengerGroupChats.map(chat => `
+        <a href="${chat.url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/30 hover:bg-blue-100/80 dark:hover:bg-blue-900/40 transition-all transform hover:scale-[1.02] text-sm font-medium text-blue-900 dark:text-blue-200 border border-blue-100/50 dark:border-blue-900/30">
+          <div class="flex items-center space-x-3 truncate">
+            <i class="fa-brands fa-facebook-messenger text-blue-600 dark:text-blue-400"></i>
+            <span class="truncate">${chat.subject}</span>
+          </div>
+          <i class="fa-solid fa-external-link text-xs opacity-60"></i>
+        </a>
+      `).join('');
+
+      document.getElementById('dashboard-chats-list').innerHTML = chatsHTML;
+      document.getElementById('full-chats-grid').innerHTML = chatsHTML;
+    }
+
+    // DYNAMIC GRADE TRACKER RENDERER
+    function renderGradeCards() {
+      const container = document.getElementById('grades-cards-container');
+      container.innerHTML = '';
+
+      gradesState.forEach((course, subIdx) => {
+        const csAvg = course.cs.length > 0 ? (course.cs.reduce((acc, item) => acc + item.score, 0) / course.cs.length) : 0;
+        const examAvg = course.exam.length > 0 ? (course.exam.reduce((acc, item) => acc + item.score, 0) / course.exam.length) : 0;
+        const finalGrade = (csAvg * 0.50) + (examAvg * 0.50);
+
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-[#12281b] p-6 rounded-3xl border border-emerald-100 dark:border-emerald-800/40 shadow-sm space-y-4 transform hover:scale-[1.01] transition-all";
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center border-b border-gray-100 dark:border-emerald-900/40 pb-3">
+            <h3 class="font-bold text-lg text-gray-900 dark:text-white">${course.subject}</h3>
+            <span class="px-3 py-1 bg-brand-100 dark:bg-emerald-900 text-brand-900 dark:text-emerald-100 font-extrabold text-sm rounded-full">
+              ${finalGrade.toFixed(1)}%
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs font-bold text-gray-600 dark:text-emerald-300 uppercase tracking-wider">
+              <span>Class Standing (50%) • Avg: ${csAvg.toFixed(1)}%</span>
+              <button onclick="addScoreItem(${subIdx}, 'cs')" class="text-brand-700 dark:text-brand-400 hover:underline flex items-center gap-1 text-xs">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add Activity
+              </button>
+            </div>
+            <div class="space-y-1.5">
+              ${course.cs.map(item => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-emerald-950/50 rounded-xl gap-2 text-xs">
+                  <input type="text" value="${item.name}" onchange="updateScoreItem(${subIdx}, 'cs', ${item.id}, 'name', this.value)" class="bg-transparent text-gray-800 dark:text-emerald-100 font-medium w-full focus:outline-none">
+                  <div class="flex items-center space-x-1 shrink-0">
+                    <input type="number" value="${item.score}" onchange="updateScoreItem(${subIdx}, 'cs', ${item.id}, 'score', parseFloat(this.value) || 0)" class="w-12 p-1 border rounded-lg text-center font-bold text-brand-800 dark:bg-emerald-900 dark:text-white dark:border-emerald-700">
+                    <button onclick="deleteScoreItem(${subIdx}, 'cs', ${item.id})" class="text-rose-400 hover:text-rose-600 p-1">
+                      <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-gray-50 dark:border-emerald-900/20">
+            <div class="flex justify-between items-center text-xs font-bold text-gray-600 dark:text-emerald-300 uppercase tracking-wider">
+              <span>Exams (50%) • Avg: ${examAvg.toFixed(1)}%</span>
+              <button onclick="addScoreItem(${subIdx}, 'exam')" class="text-brand-700 dark:text-brand-400 hover:underline flex items-center gap-1 text-xs">
+                <i class="fa-solid fa-plus text-[10px]"></i> Add Exam
+              </button>
+            </div>
+            <div class="space-y-1.5">
+              ${course.exam.map(item => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-emerald-950/50 rounded-xl gap-2 text-xs">
+                  <input type="text" value="${item.name}" onchange="updateScoreItem(${subIdx}, 'exam', ${item.id}, 'name', this.value)" class="bg-transparent text-gray-800 dark:text-emerald-100 font-medium w-full focus:outline-none">
+                  <div class="flex items-center space-x-1 shrink-0">
+                    <input type="number" value="${item.score}" onchange="updateScoreItem(${subIdx}, 'exam', ${item.id}, 'score', parseFloat(this.value) || 0)" class="w-12 p-1 border rounded-lg text-center font-bold text-brand-800 dark:bg-emerald-900 dark:text-white dark:border-emerald-700">
+                    <button onclick="deleteScoreItem(${subIdx}, 'exam', ${item.id})" class="text-rose-400 hover:text-rose-600 p-1">
+                      <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // SCORE MANIPULATION FUNCTIONS
+    function addScoreItem(subIdx, category) {
+      gradesState[subIdx][category].push({ id: Date.now(), name: category === 'cs' ? 'New Activity' : 'New Exam', score: 90 });
+      renderGradeCards();
+    }
+
+    function updateScoreItem(subIdx, category, itemId, field, value) {
+      const item = gradesState[subIdx][category].find(i => i.id === itemId);
+      if (item) {
+        item[field] = value;
+        renderGradeCards();
+      }
+    }
+
+    function deleteScoreItem(subIdx, category, itemId) {
+      gradesState[subIdx][category] = gradesState[subIdx][category].filter(i => i.id !== itemId);
+      renderGradeCards();
+    }
+
+    // UTILITY FUNCTIONS
+    function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
+    function capitalizeWords(str) { return str.replace(/\b\w/g, l => l.toUpperCase()); }
+
+    function toggleAiPanel() {
+      const panel = document.getElementById('ai-panel');
+      if (panel.classList.contains('w-0')) {
+        panel.classList.remove('w-0', 'p-0', 'overflow-hidden', 'opacity-0');
+        panel.classList.add('w-full', 'md:w-80');
+      } else {
+        panel.classList.add('w-0', 'p-0', 'overflow-hidden', 'opacity-0');
+        panel.classList.remove('w-full', 'md:w-80');
+      }
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-800', 'text-white', 'shadow-md');
+        btn.classList.add('text-gray-600', 'dark:text-emerald-200/80');
+      });
+
+      const activeView = document.getElementById(`view-${tabName}`);
+      const activeNav = document.getElementById(`nav-${tabName}`);
+      
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.add('bg-brand-800', 'text-white', 'shadow-md');
+        activeNav.classList.remove('text-gray-600', 'dark:text-emerald-200/80');
+      }
+    }
+
+    // KANBAN DRAG AND DROP
+    ['col-high', 'col-med', 'col-low'].forEach(colId => {
+      new Sortable(document.getElementById(colId), {
+        group: 'kanban',
+        animation: 150,
+        ghostClass: 'bg-brand-50'
+      });
+    });
+
+    // DISPLAY TODAY'S DATE & AUTO SET SCHEDULE DAY
+    const today = new Date();
+    document.getElementById('current-date').innerText = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const currentDayName = daysOfWeek[today.getDay()];
+    if (classSchedule[currentDayName]) {
+      activeScheduleDay = currentDayName;
+    }
+
+    // INITIAL RENDERS
+    selectScheduleDay(activeScheduleDay);
+    populateLinkCards();
+    renderTasks();
+    renderGradeCards();
+  </script>
+</body>
+</html>
